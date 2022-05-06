@@ -54,16 +54,14 @@ tile.ball.radius = 100;
 Below are `Tile`'s different methods. To use them, use e.g.
 `tile.createRectangle` in your tile.
 
-### `setBackgroundColor`
-
 ### `createRectangle`
+
+```ts
+createRectangle(x: number, y: number, width: number, height: number, moveable = false): Entity
+```
 
 `createRectangle` creates a rectangle shape on your Tile. It is the most basic
 shape that you can put on a tile.
-
-```ts
-createRectangle(x: number, y: number, width: number, height: number, moveable = false): Rectangle
-```
 
 #### Parameters
 
@@ -101,11 +99,11 @@ tile.createRectangle(tile.width / 2, 10, 10, 10, true);
 
 ### `createLine`
 
-`createLine` creates a line connecting 2 points on the grid.
-
 ```ts
-createLine(x1: number, y1: number, x2: number, y2: number, thickness: number, moveable = false): Line
+createLine(x1: number, y1: number, x2: number, y2: number, thickness: number, moveable = false): Entity
 ```
+
+`createLine` creates a line connecting 2 points on the tile.
 
 #### Parameters
 
@@ -132,12 +130,12 @@ diagonal.color = "red";
 
 ### `createTriangle`
 
+```ts
+createTriangle(x1: number, y1: number, x2: number, y2: number, x3: number, y3: number, moveable = false): Entity
+```
+
 `createTriangle` creates a triangle using 3 sets of points that are coordinates
 within a tile.
-
-```ts
-createTriangle(x1: number, y1: number, x2: number, y2: number, x3: number, y3: number, moveable = false): Triangle
-```
 
 #### Parameters
 
@@ -150,7 +148,54 @@ createTriangle(x1: number, y1: number, x2: number, y2: number, x3: number, y3: n
 - `moveable`: whether the triangle is affected by the gravity. The default is
   false, meaning that the created triangle stays in place throughout the game.
 
-#### Example: Create a ground and a ramp right above it
+#### Example: Create a triangle with an oval in the middle
+
+The triangle created is an isosceles triangle with 2 points at the bottom and 1
+point at the top.
+
+```js
+const tri = tile.createTriangle(
+  // Bottom-left point.
+  100,
+  400,
+  // Bottom-right point.
+  500,
+  400,
+  // Top-middle point.
+  300,
+  200
+);
+// Set the color to green (0 red, 255 green, 0 blue).
+tri.color = "rgb(0, 255, 0)";
+
+const eye = tile.createCircle(300, 325, 50);
+// Set the color to a darker green.
+eye.color = "rgb(0, 117, 0)";
+// Scale the y-axis by 1/2 to make it an oval.
+eye.scale(1, 0.5);
+```
+
+### `createRamp`
+
+```ts
+createRamp(x1: number, y1: number, x2: number, y2: number): Entity
+```
+
+`createRamp` creates a ramp, which is a right-angled triangle defined by 2
+points, `(x1, y1)` and `(x2, y2)`, which define the ramp entry and exit in
+either order.
+
+#### Parameters
+
+- `x1`: the X value of the first point (usually ramp entry).
+- `y1`: the Y value of the first point (usually ramp entry).
+- `x2`: the X value of the second point (usually ramp exit).
+- `y2`: the Y value of the second point (usually ramp exit).
+
+#### Example: Create the ground and a ramp right above it
+
+This example is best shown inside a completely empty tile (except for these two
+entities).
 
 ```js
 tile.createRectangle(
@@ -165,19 +210,13 @@ tile.createRectangle(
 tile.createRamp(10, tile.height - 40, tile.width, tile.height - 200);
 ```
 
-### `createRamp`
-
-```ts
-createRamp(x1: number, y1: number, x2: number, y2: number): Ramp
-```
-
 ### `createCircle`
-
-`createCircle` creates a circle on the tile.
 
 ```ts
 createCircle(x: number, y: number, radius: number, moveable = false): Circle
 ```
+
+`createCircle` creates a circle on the tile.
 
 #### Parameters
 
@@ -198,30 +237,42 @@ tile.createCircle(60, 60, 40);
 #### Example: Make a fake ball that drops from the top-middle
 
 ```ts
-let fakeBall = tile.createCircle(tile.width / 2, 20, 20, true);
-fakeBall.color = "#f99"; // salmon-ish color
+let fakeBall = tile.createCircle(
+  // Put it at the top-middle.
+  tile.width / 2,
+  20,
+  // The default size is 20.
+  20,
+  // The ball should fall.
+  true
+);
+// Set the fake ball's color to the default ball color, which is salmon-ish.
+fakeBall.color = "#f99";
 ```
 
 ### `createConveyorBelt`
 
 ```ts
-createConveyorBelt(x: number, y: number, width: number, height: number, speed: number): ConveyorBelt
+createConveyorBelt(x: number, y: number, width: number, height: number, speed: number): Entity
 ```
 
 ### `createPortals`
 
 ```ts
-createPortals(x1: number, y1: number, x2: number, y2: number): Portal[]
+createPortals(x1: number, y1: number, x2: number, y2: number): Entity[]
 ```
 
-### `createButton`
+`createPortals` yadda yadda. It returns an array of 2 entities, the first one
+being the orange portal, and the second one being the blue portal.
 
-`createButton` creates a button, which is a square that calls the given function
-if anything (including the ball) touches it.
+### `createButton`
 
 ```ts
 createButton(x: number, y: number, width: number, height: number, callback: function, endCallback = (_) => {}): Button
 ```
+
+`createButton` creates a [`Button`](./Button.md), which is a rectangle that
+calls the given function when anything (including the ball) touches it.
 
 #### Parameters
 
@@ -231,8 +282,9 @@ createButton(x: number, y: number, width: number, height: number, callback: func
   y-axis.
 - `width`: the width of the button.
 - `height`: the height of the button.
-- `callback`: the function to be called when the button is pressed.
-- `endCallback`: the function to be called when the button is no longer pressed.
+- `callback`: the function to be called when anything hits the button.
+- `endCallback`: the function to be called when the thing no longer hits the
+  button.
 
 #### Example: Change the color of a circle once the ball hits a button
 
@@ -301,11 +353,30 @@ tile.createButton(
 ### `createSpring`
 
 ```ts
-createSpring(x, y, width, height, vx, vy): Spring
+createSpring(x: number, y: number, width: number, height: number, vx: number, vy: number): Spring
 ```
 
 ### `createRope`
 
 ```ts
 createRope(x: number, y: number, length: number): Rope
+```
+
+`createRope` creates a rope in the tile with the top of the rope (anchor)
+positioned at `(x, y)`. A rope consists of beads, or small circles that dangle
+underneath the anchor.
+
+#### Parameters
+
+- `x`: the center of the anchor circle to be created relative to the
+  horizontal x-axis.
+- `y`: the center of the anchor circle to be created relative to the vertical
+  y-axis.
+- `length`: the length of the rope **in units of beads**. `2` means 2 beads
+  dangling off the anchor.
+
+#### Example: Create a rope that dangles off the top-middle
+
+```js
+tile.createRope(tile.width / 2, 10, 18);
 ```
