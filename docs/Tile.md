@@ -17,11 +17,11 @@ what or where your tile is, you will always have `0 <= x <= tile.width` and `0 <
 
 ## Properties
 
-### `width`
+### `width: number`
 
 `width` is the width of the tile. It is always 500.
 
-### `height`
+### `height: number`
 
 `height` is the height of the tile. It is always 500.
 
@@ -33,10 +33,28 @@ console.log(`${tile.width} x ${tile.height}`);
 // 500 x 500
 ```
 
+### `ball: Ball`
+
+`ball` is the game's ball. It has all of [`Circle`](./Circle.md)'s method.
+
+#### Example: Changing the ball's size and color
+
+The ball's default values are:
+
+- `color = "#f99"`
+- `radius = 20`
+
+```js
+tile.ball.color = "green";
+tile.ball.radius = 100;
+```
+
 ## Methods
 
 Below are `Tile`'s different methods. To use them, use e.g.
 `tile.createRectangle` in your tile.
+
+### `setBackgroundColor`
 
 ### `createRectangle`
 
@@ -114,8 +132,37 @@ diagonal.color = "red";
 
 ### `createTriangle`
 
+`createTriangle` creates a triangle using 3 sets of points that are coordinates
+within a tile.
+
 ```ts
 createTriangle(x1: number, y1: number, x2: number, y2: number, x3: number, y3: number, moveable = false): Triangle
+```
+
+#### Parameters
+
+- `x1`: the X value of the first point.
+- `y1`: the Y value of the first point.
+- `x2`: the X value of the second point.
+- `y2`: the Y value of the second point.
+- `x3`: the X value of the third point.
+- `y3`: the Y value of the third point.
+- `moveable`: whether the triangle is affected by the gravity. The default is
+  false, meaning that the created triangle stays in place throughout the game.
+
+#### Example: Create a ground and a ramp right above it
+
+```js
+tile.createRectangle(
+  // Put the ramp with its midpoint at the center of the tile, but subtract
+  // 20 from the tile height so it barely hovers at the bottom.
+  tile.width / 2,
+  tile.height - 20,
+  // Span the rectangle across the tile, then make it 40 values thick.
+  tile.width,
+  40
+);
+tile.createRamp(10, tile.height - 40, tile.width, tile.height - 200);
 ```
 
 ### `createRamp`
